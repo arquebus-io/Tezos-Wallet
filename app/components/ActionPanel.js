@@ -104,6 +104,9 @@ type State = {
   currentPage: number
 };
 
+const delegateAddressTabs = [TRANSACTIONS, SEND, RECEIVE];
+const managerAddresssTabs = [TRANSACTIONS, SEND, RECEIVE, DELEGATE];
+
 class ActionPanel extends Component<Props, State> {
   props: Props;
 
@@ -114,6 +117,20 @@ class ActionPanel extends Component<Props, State> {
 
   handleLinkPress = tab => {
     this.setState({ activeTab: tab })
+  }
+
+  componentWillUpdate(prevProps, prevState) {
+    const { selectedAccountHash, selectedParentHash, selectedAccount, parentIdentity, parentIndex, syncWallet } = prevProps;
+    const isManagerAddress = selectedAccountHash === selectedParentHash;
+    const { activeTab } = prevState;
+
+    const tabs = isManagerAddress ?  delegateAddressTabs : managerAddresssTabs;
+
+    // activeTab may be set to something which isn't a valid tab for the current
+    // view, so set it to the first tab as default
+    if (!tabs.includes(activeTab)) {
+      this.setState({ activeTab: tabs[0] });
+    }
   }
 
   renderSection = () => {
@@ -169,7 +186,7 @@ class ActionPanel extends Component<Props, State> {
     const { activeTab } = this.state;
     const isReady = selectedAccount.get('status') === READY;
 
-    const tabs = isManagerAddress ? [TRANSACTIONS, SEND, RECEIVE] : [TRANSACTIONS, SEND, RECEIVE, DELEGATE];
+    const tabs = isManagerAddress ?  delegateAddressTabs : managerAddresssTabs;
 
     return (
       <Container>
