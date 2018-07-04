@@ -119,8 +119,8 @@ class ActionPanel extends Component<Props, State> {
     this.setState({ activeTab: tab })
   }
 
-  componentWillUpdate(prevProps, prevState) {
-    const { selectedAccountHash, selectedParentHash, selectedAccount, parentIdentity, parentIndex, syncWallet } = prevProps;
+  static getDerivedStateFromProps(prevProps, prevState) {
+    const { selectedAccountHash, selectedParentHash } = prevProps;
     const isManagerAddress = selectedAccountHash === selectedParentHash;
     const { activeTab } = prevState;
 
@@ -129,8 +129,12 @@ class ActionPanel extends Component<Props, State> {
     // activeTab may be set to something which isn't a valid tab for the current
     // view, so set it to the first tab as default
     if (!tabs.includes(activeTab)) {
-      this.setState({ activeTab: tabs[0] });
+      return {
+        activeTab: tabs[0],
+        currentPage: 1
+      };
     }
+    return null;
   }
 
   renderSection = () => {
